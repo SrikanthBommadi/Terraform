@@ -1,5 +1,5 @@
 module "mysql_sg" {
-    source = "../../sg-ec2 vpc"
+    source = "git::https://github.com/SrikanthBommadi/Terraform//sg-ec2 vpc?ref=main"
     common-tags = var.common_tags
     environment = var.environment
     project = var.project_name
@@ -9,7 +9,7 @@ module "mysql_sg" {
 }
 
 module "backend_sg" {
-    source = "../../sg-ec2 vpc"
+    source = "git::https://github.com/SrikanthBommadi/Terraform//sg-ec2 vpc?ref=main"
     common-tags = var.common_tags
     environment = var.environment
     project = var.project_name
@@ -20,7 +20,7 @@ module "backend_sg" {
 
 
 module "frontend_sg" {
-    source = "../../sg-ec2 vpc"
+    source = "git::https://github.com/SrikanthBommadi/Terraform//sg-ec2 vpc?ref=main"
     common-tags = var.common_tags
     environment = var.environment
     project = var.project_name
@@ -31,11 +31,34 @@ module "frontend_sg" {
 
 
 module "bastion_sg" {     ####its for jumping value or jump host
-    source = "../../sg-ec2 vpc"
+    source = "git::https://github.com/SrikanthBommadi/Terraform//sg-ec2 vpc?ref=main"
     common-tags = var.common_tags
     environment = var.environment
     project = var.project_name
     sg_Name = "bastion "
     sg_description = "created for bastion instance"
+    vpc_id =data.aws_ssm_parameter.vpc_id.value
+}
+
+module "app_alb_sg" {
+    source = "git::https://github.com/SrikanthBommadi/Terraform//sg-ec2 vpc?ref=main"
+    common-tags = var.common_tags
+    environment = var.environment
+    project = var.project_name
+    sg_Name = "app-alb "
+    sg_description = "created for app alb instance"
+    vpc_id =data.aws_ssm_parameter.vpc_id.value
+}
+
+
+
+# ports 22, 443, 1194, 943 --> VPN ports
+module "vpn_sg" {
+    source = "git::https://github.com/SrikanthBommadi/Terraform//sg-ec2 vpc?ref=main"
+    common-tags = var.common_tags
+    environment = var.environment
+    project = var.project_name
+    sg_Name = "vpn "
+    sg_description = "created for vpn instance for project dev"
     vpc_id =data.aws_ssm_parameter.vpc_id.value
 }
