@@ -62,3 +62,23 @@ module "vpn_sg" {
     sg_description = "created for vpn instance for project dev"
     vpc_id =data.aws_ssm_parameter.vpc_id.value
 }
+
+##### this is for security ruleesssssssssss   (app alb trafic from bastion)
+resource "aws_security_group_rule" "app_alb_bastion" {
+  type              = "ingress"    ##ingressssss value###
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  source_security_group_id = module.bastion_sg.sg_id
+  security_group_id = module.app_alb_sg.sg_id
+}
+
+### asigning the public ip address to bastion to get the internet to the bastion
+resource "aws_security_group_rule" "bastion_publicip" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = module.bastion_sg.sg_id
+}
