@@ -85,7 +85,7 @@ resource "aws_security_group_rule" "bastion_publicip" {
 #-------- ports 22, 443, 1194, 943 --> VPN ports
 resource "aws_security_group_rule" "vpn_ssh" {
   type              = "ingress"
-  from_port         = 22
+  from_port         = 22  ##HTTP PORT
   to_port           = 22
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -94,7 +94,7 @@ resource "aws_security_group_rule" "vpn_ssh" {
 
 resource "aws_security_group_rule" "vpn_443" {
   type              = "ingress"
-  from_port         = 443
+  from_port         = 443  ###HTTP PORT
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -120,9 +120,47 @@ resource "aws_security_group_rule" "vpn_943" {
 
 resource "aws_security_group_rule" "app_alb_vpn" {
   type              = "ingress"
-  from_port         = 80
+  from_port         = 80          ###HTTP PORT###
   to_port           = 80
   protocol          = "tcp"
   security_group_id = module.app_alb_sg.sg_id
   source_security_group_id = module.vpn_sg.sg_id
+}
+
+#----------------------------#####----------------#####
+
+resource "aws_security_group_rule" "mysql_bastion" { ##rds
+  type              = "ingress"
+  from_port         = 3306    ####MYSQL###
+  to_port           = 3306
+  protocol          = "tcp"
+  source_security_group_id = module.bastion_sg.sg_id
+  security_group_id = module.mysql_sg.sg_id
+}
+
+resource "aws_security_group_rule" "mysql_vpn" {
+  type              = "ingress"
+  from_port         = 3306   ###MYSQL##
+  to_port           = 3306
+  protocol          = "tcp"
+  source_security_group_id = module.vpn_sg.sg_id
+  security_group_id = module.mysql_sg.sg_id
+}
+
+resource "aws_security_group_rule" "backend_vpn" {
+  type              = "ingress"
+  from_port         = 22  #ssh
+  to_port           = 22
+  protocol          = "tcp"
+  source_security_group_id = module.vpn_sg.sg_id
+  security_group_id = module.backend_sg.sg_id
+}
+
+resource "aws_security_group_rule" "mysql_backend" {
+  type              = "ingress"
+  from_port         = 3306     #mysql port 
+  to_port           = 3306
+  protocol          = "tcp"
+  source_security_group_id = module.backend_sg.sg_id
+  security_group_id = module.mysql_sg.sg_id
 }

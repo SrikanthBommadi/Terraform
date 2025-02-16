@@ -4,6 +4,7 @@ resource "aws_instance" "openvpn" {
   key_name = aws_key_pair.openkey.key_name
   instance_type          = "t3.micro"
   subnet_id = local.public_subnet_id
+  user_data = file("user.sh")
   tags = merge(
     var.common_tags,
     {
