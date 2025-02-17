@@ -1,0 +1,5 @@
+MYSQL_HOST: "mysql-{{ ENVIRONMENT }}.srikanthaws.fun"
+MYSQL_USER: terraform
+MYSQL_PASSWORD: Goof9959095933
+APP_LOCAION: /app
+COMPONENT: backend

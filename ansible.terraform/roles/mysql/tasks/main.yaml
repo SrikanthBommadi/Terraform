@@ -1,0 +1,34 @@
+  - name: install mysql-server
+    ansible.builtin.package:
+      name: mysql-server
+      state: present
+
+  - name: start and enable mysql-server
+    ansible.builtin.service:
+      name: mysqld
+      state: started
+      enabled: yes
+
+  - name: install pip dependies
+    ansible.builtin.pip:
+      name: "{{ item }}"
+      executable: pip3.9
+    loop:
+    - PyMySQL
+    - cryptography
+    
+  - name: connect to database
+    community.mysql.mysql_info:
+      login_user: "{{ login_user }}"
+      login_password: "{{ lookup('amazon.aws.aws_ssm', '/expense/role/mysql/mysql_root_pass', decrypt=true ) }}"
+      login_host: "{{ login_host }}"
+    register: mysql_info 
+    ignore_errors: true
+
+  - name: print mysql_info
+    ansible.builtin.debug:
+      msg: "{{ mysql_info }}"
+      
+  - name: setup mysql password 
+    ansible.builtin.command: "mysql_secure_installation --set-root-pass ExpenseApp@1"
+    when: mysql_info.failed is true

@@ -21,7 +21,7 @@ module "db" {
   
   
    # DB parameter group
-  family = "mysq8.0"
+  family = "mysql8.0"
 
   # DB option group
   major_engine_version = "8.0"
@@ -68,10 +68,10 @@ module "db" {
 
 
 
-# resource "aws_route53_record" "www-dev" {
-#   zone_id = var.zone_id
-#   name    = "mysql-${var.environment}.${var.domain_name}"
-#   type    = "CNAME"
-#   ttl     = 5
-#   records = [module.db.db_instance_address]
-# }
+resource "aws_route53_record" "www-dev" {
+  zone_id = var.zone_id
+  name    = "mysql-${var.environment}.${var.domain_name}"
+  type    = "CNAME"  ### record type trafic to another name and to aws resource
+  ttl     = 5
+  records = [module.db.db_instance_address]
+}
