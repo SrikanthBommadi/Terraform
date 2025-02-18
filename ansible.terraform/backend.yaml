@@ -1,5 +1,0 @@
-- name: configure backend service 
-  hosts: backend
-  become: yes
-  roles:
-  - backend

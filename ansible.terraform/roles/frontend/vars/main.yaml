@@ -1,3 +1,0 @@
-BACKEND_HOST: "backend.app-{{ ENVIRONMENT }}.srikanthaws.fun"
-APP_LOCAION: /usr/share/nginx/html
-COMPONENT: frontend
