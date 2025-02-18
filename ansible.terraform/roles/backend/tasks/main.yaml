@@ -1,4 +1,4 @@
-- name: disable nodejs module
+- name: disable current nodejs
   ansible.builtin.command: dnf module disable nodejs -y
   
 - name: enable nodejs:20 module 
@@ -16,28 +16,11 @@
   ansible.builtin.user:
     name: expense
 
-# - name: import from common role
-#   include_role: 
-#     name: common
-#     tasks_from: main
 
-# - name: create app directory
-#   ansible.builtin.file:
-#     state: directory
-#     path: /app
-
-# - name: download the code 
-#   ansible.builtin.get_url:
-#     dest: /tmp/backend.zip
-#     url: https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip
-
-# - name: unzip the code
-#   ansible.builtin.unarchive:
-#     src: /tmp/backend.zip
-#     dest: /app/
-#     remote_src: yes
 
 - name: install nodejs dependies
+  tags: 
+    - deployment
   community.general.npm:
     path: /app/
 
@@ -58,17 +41,17 @@
   community.mysql.mysql_db:
     state: import
     name: all
-    target: /app/schema/backend.sql
     login_host: "{{ MYSQL_HOST }}"
     login_password: "{{ MYSQL_PASSWORD }}"
     login_user: "{{ MYSQL_USER }}"
+    target: /app/schema/backend.sql
 
 - name: start,enable and daemon reload backend
   tags:
   - deployment
   ansible.builtin.systemd_service:
     name: backend
-    state: started
+    state: restarted
     enabled: true
     daemon_reload: true
 
