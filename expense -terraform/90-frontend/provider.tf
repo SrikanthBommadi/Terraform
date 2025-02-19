@@ -8,7 +8,7 @@ terraform {
 
   backend "s3" {
     bucket = "sri.terraform.backend" #bucket only for one project s3 bucket
-    key    = "alb"
+    key    = "frontend create"
     region = "us-east-1"
     dynamodb_table = "sri.terraform.backend"   #only for onr table 
   }

@@ -11,4 +11,5 @@
 
 #ls-d*/
 ### ls -dr *
-### for i in $(ls -dr *); do cd $i; terraform destroy -auto-approve; cd ..; done
+##for i in $(ls -dr*); do cd $i;terraform destroy -auto-approve; cd ..; done
+## curl http://localhost:8080/health  health check 

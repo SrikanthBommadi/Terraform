@@ -4,3 +4,14 @@ locals{
     default_vpc_id = data.aws_vpc.default.id
     default_vpc_cidr =data.aws_vpc.default.cidr_block
 }
+
+# slice(list, start_index, end_index)
+
+
+# locals {
+#   my_list = ["a", "b", "c", "d", "e"]
+# }
+
+# output "slice_example" {
+#   value = slice(local.my_list, 1, 4)
+# }

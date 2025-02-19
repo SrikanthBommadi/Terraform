@@ -50,6 +50,18 @@ module "app_alb_sg" {
     vpc_id =data.aws_ssm_parameter.vpc_id.value
 }
 
+### this is for web alb in expence projec###
+
+module "web_alb_sg" {
+    source = "git::https://github.com/SrikanthBommadi/Terraform//sg-ec2 vpc?ref=main"
+    common-tags = var.common_tags
+    environment = var.environment
+    project = var.project_name
+    sg_Name = "web-alb "
+    sg_description = "created for web alb instance"
+    vpc_id =data.aws_ssm_parameter.vpc_id.value
+}
+
 
 
 # ports 22, 443, 1194, 943 --> VPN ports
@@ -163,4 +175,41 @@ resource "aws_security_group_rule" "mysql_backend" {
   protocol          = "tcp"
   source_security_group_id = module.backend_sg.sg_id
   security_group_id = module.mysql_sg.sg_id
+}
+
+
+resource "aws_security_group_rule" "backend_vpn_http" {
+  type              = "ingress"
+  from_port         = 8080   ###http port
+  to_port           = 8080
+  protocol          = "tcp"
+  source_security_group_id = module.vpn_sg.sg_id
+  security_group_id = module.backend_sg.sg_id
+}
+
+
+resource "aws_security_group_rule" "backend_app_alb" {
+  type              = "ingress"
+  from_port         = 8080   ###http port
+  to_port           = 8080
+  protocol          = "tcp"
+  source_security_group_id = module.app_alb_sg.sg_id
+  security_group_id = module.backend_sg.sg_id
+}
+
+resource "aws_security_group_rule" "web_alb_https" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = module.web_alb_sg.sg_id
+}
+resource "aws_security_group_rule" "frontend_publicip" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = module.frontend_sg.sg_id
 }

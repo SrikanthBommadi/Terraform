@@ -1,31 +1,31 @@
 module "alb" {
   source = "terraform-aws-modules/alb/aws"  #this is the copy of the sorce 
-  internal = true                           # because its private we hace to give true for refering from the net
+  internal = false                         # because its public we have to give true for refering from the net
 
 #our project detail below
-name = "${var.project_name}-${var.environment}-app-alb"
+name = "${var.project_name}-${var.environment}-web-alb"
 vpc_id = data.aws_ssm_parameter.vpc_id.value
-subnets = local.private_subnet_ids
+subnets = local.public_subnet_ids
 create_security_group = false   # if true means u have to take from the source path only
 enable_deletion_protection = false
-security_groups = [local.app_alb_sg_id]
+security_groups = [local.web_alb_sg_id]
 tags =merge(
     var.common_tags,
     {
-        Name ="${var.project_name}-${var.environment}-app-alb"
+        Name ="${var.project_name}-${var.environment}-web-alb"
     }
 )
-
 }
 
-#--- NOW CRTEATING BACKEND LOAD BALANCER###
-resource "aws_lb_listener" "backend" {
+resource "aws_lb_listener" "https" {
   load_balancer_arn = module.alb.arn
-  port              = "80"
-  protocol          = "HTTP"
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = local.certificate_arn
 
   default_action {
-    type = "fixed-response"
+    type             = "fixed-response"
 
     fixed_response {
       content_type = "text/html"   # its only content after text 
@@ -35,9 +35,10 @@ resource "aws_lb_listener" "backend" {
   }
 }
 
-resource "aws_route53_record" "app_alb" {
+
+resource "aws_route53_record" "web_alb" {
   zone_id = var.zone_id
-  name    = "*.app-dev.${var.domain_name}"
+  name    = "*.web-dev.${var.domain_name}"
   type    = "A"
 ##ALB DNS NAME AND ZONE INFO
   alias {  #alias mean it will take the automatically from the aws account 
